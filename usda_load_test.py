@@ -58,7 +58,15 @@ class TestUSDALoadMethods(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             decompress_usda_data(zip_filename, json_filename)
-       
+
+    def test_get_usda_data(self):
+        json = decompress_usda_data(
+            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip", 
+            json_filename="FoodData_Central_foundation_food_json_2021-10-28.json"
+            )
+        
+        self.assertGreater(len(json), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
