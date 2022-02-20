@@ -1,4 +1,10 @@
+# python interpreter cache
 __pycache__/*
 
+# data files
 /*.zip
 /*.json
+/testfiles
+
+# vs code files
+.vscode/*
