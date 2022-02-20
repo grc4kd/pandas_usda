@@ -33,6 +33,9 @@ class TestUSDALoadMethods(unittest.TestCase):
         zip_filename = "FoodData_Central_foundation_food_json_2021-10-28.zip"
         json_filename = "FoodData_Central_foundation_food_json_2021-10-28.json"
 
+        # clear file before decompression test
+        os.remove(json_filename)
+
         decompress_usda_data(zip_filename, json_filename)
 
         self.assertTrue(os.path.exists(json_filename))
@@ -55,7 +58,7 @@ class TestUSDALoadMethods(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             decompress_usda_data(zip_filename, json_filename)
-
+       
 
 if __name__ == '__main__':
     unittest.main()

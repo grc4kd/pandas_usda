@@ -17,9 +17,9 @@ def decompress_usda_data(zip_filename, json_filename):
         FNF_ERR(zip_filename)
 
     if not os.path.exists(json_filename):
-        print (f"Unzipping to json file {json_filename}")
+        print (f"Unzipping json file {json_filename}")
         with zipfile.ZipFile(zip_filename) as zf:
-            zf.extractall()
+            zf.extract(json_filename)
     else:
         print (f"JSON data exists, skipping unzip operation")
 
