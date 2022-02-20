@@ -1,12 +1,20 @@
 import json
 from re import L
 import zipfile
-import os
+import os, errno
+
+# DRY file not found error
+def FNF_ERR(filename):
+    raise FileNotFoundError(
+        errno.ENOENT,
+        os.strerror(errno.ENOENT),
+        filename
+    )
 
 def decompress_usda_data(zip_filename, json_filename):
     if not os.path.exists(zip_filename):
         print (f"Can't find zip file {zip_filename}")
-        exit -1
+        FNF_ERR(zip_filename)
 
     if not os.path.exists(json_filename):
         print (f"Unzipping to json file {json_filename}")

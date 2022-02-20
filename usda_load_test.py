@@ -1,16 +1,8 @@
 import os, shutil, errno
 import unittest
 
-
-from usda_load import decompress_usda_data, cleanup_usda_data
-
-# DRY file not found error
-def FNF_ERR(filename):
-    raise FileNotFoundError(
-        errno.ENOENT,
-        os.strerror(errno.ENOENT),
-        filename
-    )
+from usda_load import decompress_usda_data, cleanup_usda_data,\
+    FNF_ERR
 
 # try to load testfile over filename
 # if the file is not already loaded
@@ -20,6 +12,7 @@ def try_loadtestfile(testfile, filename):
         if not os.path.exists(testfile):
             FNF_ERR(testfile)
         shutil.copy(testfile, filename)
+
 
 # start test class
 class TestUSDALoadMethods(unittest.TestCase):
@@ -53,6 +46,15 @@ class TestUSDALoadMethods(unittest.TestCase):
         cleanup_usda_data(json_filename)
 
         self.assertFalse(os.path.exists(json_filename))
+
+
+    def test_decompress_usda_data_FNF_ERR(self):
+        # file should not exist
+        zip_filename = "ThatoneFileI_was_lookingfor.zip"
+        json_filename = "FoodData.json"
+
+        with self.assertRaises(FileNotFoundError):
+            decompress_usda_data(zip_filename, json_filename)
 
 
 if __name__ == '__main__':
