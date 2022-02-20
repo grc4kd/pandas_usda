@@ -7,4 +7,4 @@ __pycache__/*
 /testfiles
 
 # vs code files
-.vscode/*
+.vscode/
