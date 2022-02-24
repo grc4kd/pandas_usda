@@ -2,6 +2,7 @@ import json
 from re import L
 import zipfile
 import os, errno
+import pandas as pd
 
 # DRY file not found error
 def FNF_ERR(filename):
@@ -34,3 +35,19 @@ def cleanup_usda_data(json_filename):
     if os.path.exists(json_filename):
         print (f"Removing JSON file {json_filename}")
         os.remove(json_filename)
+
+
+def load_all_foods(json_filename):
+    df_foods = pd.read_json(json_filename)
+
+    all_foods = {}
+
+    # parse the JSON in USDA format
+    # FoundationFoods is root element
+    for food in df_foods["FoundationFoods"]:
+        # each food has a list of inputFoods that are parented by FoundationFoods
+        for inputFoods in food["inputFoods"]:
+            # append all results to a flat dictionary of input foods
+            all_foods[inputFoods["id"]] = inputFoods
+
+    return all_foods

@@ -1,10 +1,13 @@
-import os, shutil, errno
+import os
+import shutil
 import unittest
 import usda_load
 
 # try to load testfile over filename
 # if the file is not already loaded
 # TODO check file contents before each test
+
+
 def try_loadtestfile(testfile, filename):
     if not os.path.exists(filename):
         if not os.path.exists(testfile):
@@ -26,7 +29,6 @@ class TestUSDALoadMethods(unittest.TestCase):
         try_loadtestfile(zip_testfile, zip_filename)
         try_loadtestfile(json_testfile, json_filename)
 
-
     def test_decompress_usda_data(self):
         zip_filename = "FoodData_Central_foundation_food_json_2021-10-28.zip"
         json_filename = "FoodData_Central_foundation_food_json_2021-10-28.json"
@@ -38,16 +40,14 @@ class TestUSDALoadMethods(unittest.TestCase):
 
         self.assertTrue(os.path.exists(json_filename))
 
-
     def test_cleanup_usda_data(self):
         json_filename = "FoodData_Central_foundation_food_json_2021-10-28.json"
-        
+
         self.assertTrue(os.path.exists(json_filename))
-        
+
         usda_load.cleanup_usda_data(json_filename)
 
         self.assertFalse(os.path.exists(json_filename))
-
 
     def test_decompress_usda_data_FNF_ERR(self):
         # file should not exist
@@ -59,22 +59,45 @@ class TestUSDALoadMethods(unittest.TestCase):
 
     def test_get_usda_data(self):
         json = usda_load.decompress_usda_data(
-            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip", 
+            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip",
             json_filename="FoodData_Central_foundation_food_json_2021-10-28.json"
-            )
-        
+        )
+
         self.assertGreater(len(json), 0)
 
     def test_load_all_foods(self):
-        json = usda_load.decompress_usda_data(
-            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip", 
-            json_filename="FoodData_Central_foundation_food_json_2021-10-28.json"
-            )
+        json_filename = "FoodData_Central_foundation_food_json_2021-10-28.json"
+        json_data = usda_load.decompress_usda_data(
+            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip",
+            json_filename=json_filename
+        )
 
-        subfoods = usda_load.load_all_foods
+        # load a dictionary of all foods
+        flat_foods = usda_load.load_all_foods(json_filename)
 
         # there should be more than 200 foods
-        self.assertGreater(len(subfoods), 200)
+        self.assertGreater(len(flat_foods), 200)
+
+        # test a few dictionary lookups
+        self.assertDictContainsSubset(
+            {
+                10922: {
+                    "id": 10922, 
+                    "foodDescription": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW", 
+                    "inputFood": {
+                        "foodClass": "Composite", 
+                        "description": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW", 
+                        "foodCategory": {
+                            "id": 2, "code": "0200", "description": "Spices and Herbs"
+                        }, 
+                        "fdcId": 326494, 
+                        "dataType": "Sample", 
+                        "publicationDate": "4/1/2019"
+                    }
+                }
+            },
+            flat_foods)
+
 
 if __name__ == '__main__':
     unittest.main()
