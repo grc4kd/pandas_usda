@@ -10,12 +10,11 @@ json = decompress_usda_data(
     )
 
 # read original JSON file in
-food_df = pd.read_json(json_filename, orient='records')
+df_foods = pd.read_json(json_filename)
+df_foods = pd.json_normalize(df_foods.FoundationFoods)
 
-# write out records to a new JSON file
-im1_filename = "FoodData_IM1.json"
-food_sub_json = food_df.to_json(im1_filename)
+# create subset of foods pandas object
+# where the food has a scientific name data
+df_sci_foods = df_foods[df_foods["scientificName"].notna()]
 
-food_df = pd.read_json(im1_filename, orient='index')
-
-print(food_df.head())
+print(df_sci_foods.head())

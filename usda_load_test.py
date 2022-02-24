@@ -1,8 +1,6 @@
 import os, shutil, errno
 import unittest
-
-from usda_load import decompress_usda_data, cleanup_usda_data,\
-    FNF_ERR
+import usda_load
 
 # try to load testfile over filename
 # if the file is not already loaded
@@ -10,7 +8,7 @@ from usda_load import decompress_usda_data, cleanup_usda_data,\
 def try_loadtestfile(testfile, filename):
     if not os.path.exists(filename):
         if not os.path.exists(testfile):
-            FNF_ERR(testfile)
+            usda_load.FNF_ERR(testfile)
         shutil.copy(testfile, filename)
 
 
@@ -36,7 +34,7 @@ class TestUSDALoadMethods(unittest.TestCase):
         # clear file before decompression test
         os.remove(json_filename)
 
-        decompress_usda_data(zip_filename, json_filename)
+        usda_load.decompress_usda_data(zip_filename, json_filename)
 
         self.assertTrue(os.path.exists(json_filename))
 
@@ -46,7 +44,7 @@ class TestUSDALoadMethods(unittest.TestCase):
         
         self.assertTrue(os.path.exists(json_filename))
         
-        cleanup_usda_data(json_filename)
+        usda_load.cleanup_usda_data(json_filename)
 
         self.assertFalse(os.path.exists(json_filename))
 
@@ -57,16 +55,26 @@ class TestUSDALoadMethods(unittest.TestCase):
         json_filename = "FoodData.json"
 
         with self.assertRaises(FileNotFoundError):
-            decompress_usda_data(zip_filename, json_filename)
+            usda_load.decompress_usda_data(zip_filename, json_filename)
 
     def test_get_usda_data(self):
-        json = decompress_usda_data(
+        json = usda_load.decompress_usda_data(
             zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip", 
             json_filename="FoodData_Central_foundation_food_json_2021-10-28.json"
             )
         
         self.assertGreater(len(json), 0)
 
+    def test_load_all_foods(self):
+        json = usda_load.decompress_usda_data(
+            zip_filename="FoodData_Central_foundation_food_json_2021-10-28.zip", 
+            json_filename="FoodData_Central_foundation_food_json_2021-10-28.json"
+            )
+
+        subfoods = usda_load.load_all_foods
+
+        # there should be more than 200 foods
+        self.assertGreater(len(subfoods), 200)
 
 if __name__ == '__main__':
     unittest.main()
