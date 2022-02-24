@@ -21,9 +21,10 @@ def decompress_usda_data(zip_filename, json_filename):
         with zipfile.ZipFile(zip_filename) as zf:
             zf.extract(json_filename)
     else:
-        print (f"JSON data exists, skipping unzip operation")
+        print ("JSON data exists, skipping unzip operation")
     
     # load JSON from file
+    # return Python object to caller
     with open(json_filename) as f:
         data = json.load(f)
         return data
