@@ -101,25 +101,24 @@ class TestUSDALoadMethods(unittest.TestCase):
         # there should be more than 200 foods
         self.assertGreater(len(flat_foods), 200)
 
-        # test one dictionary lookups
-        self.assertDictContainsSubset(
+        # test one dictionary lookup
+        self.assertEqual(
+            flat_foods.get(10922),
             {
-                10922: {
-                    "id": 10922,
-                    "foodDescription": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
-                    "inputFood": {
-                        "foodClass": "Composite",
-                        "description": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
-                        "foodCategory": {
-                            "id": 2, "code": "0200", "description": "Spices and Herbs"
-                        },
-                        "fdcId": 326494,
-                        "dataType": "Sample",
-                        "publicationDate": "4/1/2019"
-                    }
+                "id": 10922,
+                "foodDescription": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
+                "inputFood": {
+                    "foodClass": "Composite",
+                    "description": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
+                    "foodCategory": {
+                        "id": 2, "code": "0200", "description": "Spices and Herbs"
+                    },
+                    "fdcId": 326494,
+                    "dataType": "Sample",
+                    "publicationDate": "4/1/2019"
                 }
-            },
-            flat_foods)
+            }
+        )
 
 
 if __name__ == '__main__':

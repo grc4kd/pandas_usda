@@ -1,0 +1,5 @@
+Removing JSON file FoodData_Central_foundation_food_json_2021-10-28.json
+Unzipping json file FoodData_Central_foundation_food_json_2021-10-28.json
+Can't find zip file ThatoneFileI_was_lookingfor.zip
+JSON data exists, skipping unzip operation
+JSON data exists, skipping unzip operation
