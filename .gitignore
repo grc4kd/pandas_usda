@@ -4,10 +4,9 @@ __pycache__/*
 # data files
 /*.zip
 /*.json
-/testfiles
+/testfiles/
+/logs/
 
-# log files
-/logs
 
 # vs code files
 .vscode/
