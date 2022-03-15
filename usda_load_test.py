@@ -1,24 +1,35 @@
+import json
 import os
 import shutil
 import unittest
+import zipfile
 import usda_load
 
-# try to load testfile over filename
-# if the file is not already loaded
-# TODO check file contents before each test
 
+def _decompress_usda_data(zip_filename, json_filename):
+    if not os.path.exists(zip_filename):
+        print(f"Can't find zip file {zip_filename}")
+        usda_load.FNF_ERR(zip_filename)
+    if not os.path.exists(json_filename):
+        print(f"Unzipping json file {json_filename}")
+        with zipfile.ZipFile(zip_filename) as zf:
+            zf.extract(json_filename)
+    else:
+        print("JSON data exists, skipping unzip operation")
 
-def try_loadtestfile(testfile, filename):
-    if not os.path.exists(filename):
-        if not os.path.exists(testfile):
-            usda_load.FNF_ERR(testfile)
-        shutil.copy(testfile, filename)
+    # load JSON from file
+    # return Python object to caller
+    with open(json_filename) as f:
+        data = json.load(f)
+        return data
 
 
 # start test class
 class TestUSDALoadMethods(unittest.TestCase):
     # run setUp(self) between each unit test
     # make sure both ZIP and JSON data files are loaded
+    # into the live folder. This is the expected state
+    # before running any test in this class
     def setUp(self):
         # re-import test data as needed between each test
         zip_testfile = "testfiles/FoodData_Central_foundation_food_json_2021-10-28.zip"
@@ -26,8 +37,20 @@ class TestUSDALoadMethods(unittest.TestCase):
         json_testfile = "testfiles/FoodData_Central_foundation_food_json_2021-10-28.json"
         json_filename = "FoodData_Central_foundation_food_json_2021-10-28.json"
 
-        try_loadtestfile(zip_testfile, zip_filename)
-        try_loadtestfile(json_testfile, json_filename)
+        # files in the testfiles directory are backing files and should be handled first
+        if not os.path.exists(zip_testfile):
+            # a zip file is required at ./testfiles/FoodData_Central_foundation_food_json_2021-10-28.zip
+            raise usda_load.FNF_ERR(
+                f"cannot continue, a required zip file is missing at {zip_testfile}")
+        # extract the zip file into the backing directory, trading space for convenience
+        if not os.path.exists(json_testfile):
+            with zipfile.ZipFile(zip_filename) as zf:
+                zf.extract(json_filename)
+        # copy backing file over missing live file
+        if not os.path.exists(zip_filename):
+            shutil.copy(zip_testfile, zip_filename)
+        if not os.path.exists(json_filename):
+            shutil.copy(json_testfile, json_filename)
 
     def test_decompress_usda_data(self):
         zip_filename = "FoodData_Central_foundation_food_json_2021-10-28.zip"
@@ -78,20 +101,20 @@ class TestUSDALoadMethods(unittest.TestCase):
         # there should be more than 200 foods
         self.assertGreater(len(flat_foods), 200)
 
-        # test a few dictionary lookups
+        # test one dictionary lookups
         self.assertDictContainsSubset(
             {
                 10922: {
-                    "id": 10922, 
-                    "foodDescription": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW", 
+                    "id": 10922,
+                    "foodDescription": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
                     "inputFood": {
-                        "foodClass": "Composite", 
-                        "description": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW", 
+                        "foodClass": "Composite",
+                        "description": "Mustard, yellow, FRENCHS CLASSIC (CO,CT) - CY120PW",
                         "foodCategory": {
                             "id": 2, "code": "0200", "description": "Spices and Herbs"
-                        }, 
-                        "fdcId": 326494, 
-                        "dataType": "Sample", 
+                        },
+                        "fdcId": 326494,
+                        "dataType": "Sample",
                         "publicationDate": "4/1/2019"
                     }
                 }
